@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: info1er-gc-backend
+    env: python
+    plan: starter
+    branch: main
+    repoPath: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: bash -lc "python manage.py migrate --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT"
+    healthCheckPath: /api/
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        value: replace-with-secret
+      - key: DJANGO_DEBUG
+        value: 'False'
+      - key: DJANGO_ALLOWED_HOSTS
+        value: your-backend.onrender.com
+      - key: DJANGO_CORS_ALLOW_ALL_ORIGINS
+        value: 'False'
+      - key: DJANGO_CORS_ALLOWED_ORIGINS
+        value: https://your-frontend.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: info1er-gc-db
+
+staticSites:
+  - name: info1er-gc-frontend
+    env: static
+    plan: starter
+    branch: main
+    repoPath: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://your-backend.onrender.com/api
+
+databases:
+  - name: info1er-gc-db
+    engine: postgresql
+    version: 15
+    plan: starter
