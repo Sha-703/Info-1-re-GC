@@ -31,12 +31,37 @@ function Cours() {
     fetchLessonDetail(lessonId);
   };
 
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+  const apiRootUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+
   const getVideoUrl = (videoUrl) => {
     if (!videoUrl) return '';
     // Si l'URL est déjà absolue (commence par http), retourner telle quelle
     if (videoUrl.startsWith('http')) return videoUrl;
-    // Sinon, construire l'URL absolue en utilisant l'API base URL
-    return `http://localhost:8000${videoUrl}`;
+    // Sinon, construire l'URL absolue en utilisant l'URL de base du backend
+    return `${apiRootUrl}${videoUrl}`;
+  };
+
+  const isYouTube = (url) => {
+    if (!url) return false;
+    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/i.test(url);
+  };
+
+  const toYouTubeEmbed = (url) => {
+    if (!url) return '';
+    try {
+      // Si déjà embed
+      if (url.includes('youtube.com/embed/')) return url;
+      // youtu.be short link
+      const shortMatch = url.match(/youtu\.be\/(.+)$/);
+      if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+      // standard watch?v= link
+      const vMatch = url.match(/[?&]v=([^&]+)/);
+      if (vMatch) return `https://www.youtube.com/embed/${vMatch[1]}`;
+      return url;
+    } catch (e) {
+      return url;
+    }
   };
 
   const getIconAndColor = (number) => {
@@ -497,11 +522,21 @@ function Cours() {
                       <div style={{ display: 'grid', gap: '1.5rem', width: '100%' }}>
                         {lessonDetails[currentChapter].videos.map((video) => (
                           <div key={video.id} style={{ borderRadius: '1.25rem', overflow: 'hidden', background: 'white', boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)', maxWidth: '100%' }}>
-                            <video
-                              controls
-                              style={{ width: '100%', height: '480px', objectFit: 'cover', background: 'black' }}
-                              src={getVideoUrl(video.video_url)}
-                            />
+                            {isYouTube(video.video_url) ? (
+                              <iframe
+                                title={video.title}
+                                src={toYouTubeEmbed(video.video_url)}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                style={{ width: '100%', height: '480px', border: 'none' }}
+                              />
+                            ) : (
+                              <video
+                                controls
+                                style={{ width: '100%', height: '480px', objectFit: 'cover', background: 'black' }}
+                                src={getVideoUrl(video.video_url)}
+                              />
+                            )}
                             <div style={{ padding: '1.75rem', textAlign: 'left' }}>
                               <h3 style={{ margin: '0 0 0.75rem 0', color: '#1f2937', fontSize: '1.35rem', fontWeight: '700' }}>{video.title}</h3>
                               <p style={{ margin: 0, color: '#6b7280', fontSize: '1rem', lineHeight: '1.6' }}>{video.description || 'Vidéo tutorielle intégrée depuis le backend.'}</p>

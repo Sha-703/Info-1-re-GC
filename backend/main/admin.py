@@ -13,13 +13,11 @@ class VideoInline(admin.TabularInline):
     model = Video
     extra = 3
     readonly_fields = ('video_preview',)
-    fields = ('title', 'file', 'url', 'video_preview')
+    fields = ('title', 'url', 'video_preview')
 
     def video_preview(self, obj):
         if not obj:
             return ''
-        if obj.file:
-            return format_html('<a href="{}" target="_blank">Voir le fichier</a>', obj.file.url)
         if obj.url:
             return format_html('<a href="{}" target="_blank">Voir la vidéo</a>', obj.url)
         return ''
@@ -62,14 +60,12 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
-    list_display = ['title', 'lesson', 'url', 'file', 'created_at']
+    list_display = ['title', 'lesson', 'url', 'created_at']
     search_fields = ['title', 'lesson__title']
 
     def video_preview(self, obj):
         if not obj:
             return ''
-        if obj.file:
-            return format_html('<a href="{}" target="_blank">Voir le fichier</a>', obj.file.url)
         if obj.url:
             return format_html('<a href="{}" target="_blank">Voir la vidéo</a>', obj.url)
         return ''

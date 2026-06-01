@@ -80,8 +80,7 @@ class Lesson(models.Model):
 class Video(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='videos')
     title = models.CharField(max_length=200)
-    url = models.URLField(blank=True)
-    file = models.FileField(upload_to='lesson_videos/', blank=True, null=True)
+    url = models.URLField(blank=True, help_text="Collez l'URL YouTube (ex: https://www.youtube.com/watch?v=...)")
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -93,8 +92,6 @@ class Video(models.Model):
 
     @property
     def video_url(self):
-        if self.file:
-            return self.file.url
         return self.url
 
 

@@ -87,19 +87,14 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
 
 class VideoSerializer(serializers.ModelSerializer):
     video_url = serializers.SerializerMethodField()
-    file = serializers.FileField(required=False, allow_null=True)
     url = serializers.URLField(required=False, allow_blank=True)
 
     class Meta:
         model = Video
-        fields = ['id', 'lesson', 'title', 'url', 'file', 'video_url', 'description', 'created_at']
+        fields = ['id', 'lesson', 'title', 'url', 'video_url', 'description', 'created_at']
 
     def get_video_url(self, obj):
         """Retourne l'URL de la vidéo (fichier ou URL externe)"""
-        if obj.file and obj.file.name:
-            # Si c'est un fichier uploadé, retourner l'URL du fichier
-            return obj.file.url
-        # Sinon retourner l'URL externe
         return obj.url if obj.url else ''
 
 
