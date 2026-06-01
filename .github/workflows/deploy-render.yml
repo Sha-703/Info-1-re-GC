@@ -1,0 +1,28 @@
+name: Deploy → Render
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  trigger-render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render backend deploy
+        if: ${{ secrets.RENDER_API_KEY && secrets.RENDER_BACKEND_SERVICE_ID }}
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_BACKEND_SERVICE_ID }}/deploys" \
+            -d '{"clearCache":true}' || true
+
+      - name: Trigger Render frontend deploy
+        if: ${{ secrets.RENDER_API_KEY && secrets.RENDER_FRONTEND_SERVICE_ID }}
+        run: |
+          curl -sS -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_FRONTEND_SERVICE_ID }}/deploys" \
+            -d '{"clearCache":true}' || true
