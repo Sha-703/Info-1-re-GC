@@ -3,6 +3,12 @@ from pathlib import Path
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
+# optional helper to parse DATABASE_URL with conn_max_age
+try:
+    import dj_database_url
+except Exception:
+    dj_database_url = None
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
@@ -59,33 +65,39 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
-    parsed_url = urlparse(DATABASE_URL)
-    if parsed_url.scheme.startswith('postgres'):
+    # prefer dj_database_url when available (adds conn_max_age and options)
+    if dj_database_url:
         DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': parsed_url.path[1:],
-                'USER': parsed_url.username or '',
-                'PASSWORD': parsed_url.password or '',
-                'HOST': parsed_url.hostname or '',
-                'PORT': parsed_url.port or '',
-            }
-        }
-    elif parsed_url.scheme == 'sqlite':
-        sqlite_path = parsed_url.path[1:] if parsed_url.path.startswith('/') else parsed_url.path
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / sqlite_path,
-            }
+            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
         }
     else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
+        parsed_url = urlparse(DATABASE_URL)
+        if parsed_url.scheme.startswith('postgres'):
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql',
+                    'NAME': parsed_url.path[1:],
+                    'USER': parsed_url.username or '',
+                    'PASSWORD': parsed_url.password or '',
+                    'HOST': parsed_url.hostname or '',
+                    'PORT': parsed_url.port or '',
+                }
             }
-        }
+        elif parsed_url.scheme == 'sqlite':
+            sqlite_path = parsed_url.path[1:] if parsed_url.path.startswith('/') else parsed_url.path
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': BASE_DIR / sqlite_path,
+                }
+            }
+        else:
+            DATABASES = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': BASE_DIR / 'db.sqlite3',
+                }
+            }
 else:
     DATABASES = {
         'default': {
@@ -116,6 +128,7 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 IMPORT_LESSONS_DIR = BASE_DIR / 'media_imports'

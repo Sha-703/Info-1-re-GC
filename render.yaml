@@ -6,7 +6,7 @@ services:
     branch: main
     repoPath: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: bash -lc "python manage.py migrate --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: bash -lc "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT"
     healthCheckPath: /api/
     envVars:
       - key: DJANGO_SECRET_KEY
@@ -14,11 +14,11 @@ services:
       - key: DJANGO_DEBUG
         value: 'False'
       - key: DJANGO_ALLOWED_HOSTS
-        value: your-backend.onrender.com
+        value: info1er-gc-backend.onrender.com
       - key: DJANGO_CORS_ALLOW_ALL_ORIGINS
         value: 'False'
       - key: DJANGO_CORS_ALLOWED_ORIGINS
-        value: https://your-frontend.onrender.com
+        value: https://info1er-gc-frontend.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: info1er-gc-db
@@ -33,7 +33,7 @@ staticSites:
     publishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://your-backend.onrender.com/api
+        value: https://info1er-gc-backend.onrender.com/api
 
 databases:
   - name: info1er-gc-db

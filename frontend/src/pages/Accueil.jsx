@@ -12,6 +12,7 @@ function Accueil() {
         <div className="animated-text-container">
           <h1 className="animated-title">Bienvenue sur l'application éducative</h1>
           <p className="animated-subtitle">La plateforme moderne pour l'apprentissage numérique</p>
+          <Link to="/cours" className="cta-primary">Découvrir les cours</Link>
         </div>
         <div className="card-grid-centered">
           <Link to="/cours" className="card">

@@ -2,7 +2,7 @@ function Apropos() {
   const logoImage = new URL('../../logoapp.png', import.meta.url).href;
 
   return (
-    <section className="page">
+    <section className="page apropos-page">
       <div className="apropos-container">
         <div className="apropos-header">
           <div>
