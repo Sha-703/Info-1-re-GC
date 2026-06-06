@@ -57,7 +57,7 @@ function Login() {
   const backgroundImage = new URL('../../pg.jpg', import.meta.url).href;
 
   return (
-    <section className="page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', backgroundRepeat: 'no-repeat', position: 'relative' }}>
+    <section className="page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'scroll', backgroundRepeat: 'no-repeat', position: 'relative' }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.5)', zIndex: 1 }} />
       <div style={{ width: '100%', maxWidth: '450px', padding: '1.5rem', position: 'relative', zIndex: 2 }}>
         {/* Conteneur principal */}
