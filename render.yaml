@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: info1er-gc-backend
+    name: info1er-gc-backend-x1o4
     env: python
     plan: starter
     branch: main
@@ -14,17 +14,17 @@ services:
       - key: DJANGO_DEBUG
         value: 'False'
       - key: DJANGO_ALLOWED_HOSTS
-        value: info1er-gc-backend.onrender.com
+        value: info1er-gc-backend-x1o4.onrender.com
       - key: DJANGO_CORS_ALLOW_ALL_ORIGINS
         value: 'False'
       - key: DJANGO_CORS_ALLOWED_ORIGINS
-        value: https://info1er-gc-frontend.onrender.com
+        value: https://info-1re-gc.onrender.com
       - key: DATABASE_URL
         fromDatabase:
           name: info1er-gc-db
 
 staticSites:
-  - name: info1er-gc-frontend
+  - name: info-1re-gc
     env: static
     plan: starter
     branch: main
@@ -33,7 +33,7 @@ staticSites:
     publishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://info1er-gc-backend.onrender.com/api
+        value: https://info1er-gc-backend-x1o4.onrender.com/api
 
 databases:
   - name: info1er-gc-db
