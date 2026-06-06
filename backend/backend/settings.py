@@ -14,7 +14,14 @@ load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'change-me-for-production')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',') if host.strip()]
+
+allowed_hosts_value = os.environ.get('DJANGO_ALLOWED_HOSTS')
+if not allowed_hosts_value and os.environ.get('RENDER_SERVICE_ID'):
+    allowed_hosts_value = 'localhost,.onrender.com'
+elif not allowed_hosts_value:
+    allowed_hosts_value = 'localhost'
+
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_value.split(',') if host.strip()]
 if DEBUG:
     ALLOWED_HOSTS.extend(['127.0.0.1', 'localhost'])
 ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
