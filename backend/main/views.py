@@ -94,6 +94,11 @@ class LessonViewSet(viewsets.ModelViewSet):
     serializer_class = LessonSerializer
     permission_classes = [IsTeacherOrReadOnly]
 
+    def get_queryset(self):
+        if self.action in ['retrieve', 'questions', 'submit_quiz']:
+            return Lesson.objects.all().order_by('order')
+        return self.queryset
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return LessonDetailSerializer
