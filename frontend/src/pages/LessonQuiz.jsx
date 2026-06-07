@@ -33,7 +33,11 @@ function LessonQuiz() {
     if (lessons.some((lesson) => lesson.id === lessonId)) {
       return lessonId;
     }
-    const resolved = lessonOrderMap[lessonId] || lessonId;
+    const resolved = lessonOrderMap[lessonId];
+    if (!resolved) {
+      console.warn('Lesson order mapping missing for lessonId:', lessonId, 'map:', lessonOrderMap);
+      return null;
+    }
     console.log('Resolved lesson id', { input: lessonId, resolved });
     return resolved;
   };

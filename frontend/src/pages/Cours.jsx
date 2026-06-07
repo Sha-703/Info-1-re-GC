@@ -9,6 +9,7 @@ function Cours() {
   const [activeSection, setActiveSection] = useState('content');
   const [lessonDetails, setLessonDetails] = useState({});
   const [lessonOrderMap, setLessonOrderMap] = useState({});
+  const [lessonsLoaded, setLessonsLoaded] = useState(false);
   const [loadingLesson, setLoadingLesson] = useState(false);
   const navigate = useNavigate();
 
@@ -26,13 +27,22 @@ function Cours() {
         console.log('Loaded lesson order map:', map);
       } catch (error) {
         console.error('Erreur lors du chargement des leçons pour la carte de correspondance :', error);
+      } finally {
+        setLessonsLoaded(true);
       }
     };
 
     fetchLessons();
   }, []);
 
-  const resolveLessonId = (lessonNumber) => lessonOrderMap[lessonNumber] || lessonNumber;
+  const resolveLessonId = (lessonNumber) => {
+    const resolved = lessonOrderMap[lessonNumber];
+    if (!resolved) {
+      console.warn('Lesson order mapping missing for lessonNumber:', lessonNumber, 'map:', lessonOrderMap);
+      return null;
+    }
+    return resolved;
+  };
 
   const fetchLessonDetail = async (lessonId) => {
     if (!lessonId || lessonDetails[lessonId]) return;
@@ -49,10 +59,15 @@ function Cours() {
   };
 
   const openLessonModal = (content, lessonNumber, number) => {
+    const resolved = resolveLessonId(lessonNumber);
+    if (!resolved) {
+      alert('Le service de leçons n’est pas encore prêt ou l’identifiant est introuvable. Réessayez dans un instant.');
+      return;
+    }
+
     setModalLesson(content);
     setCurrentChapter(number);
     setActiveSection('content');
-    const resolved = resolveLessonId(lessonNumber);
     console.log('Opening lesson modal', { lessonNumber, resolved });
     fetchLessonDetail(resolved);
   };
