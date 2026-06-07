@@ -387,68 +387,14 @@ function Cours() {
         })}
       </div>
       {modalLesson && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          background: 'rgba(0, 0, 0, 0.85)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-          backdropFilter: 'blur(4px)',
-          animation: 'fadeInSequence 0.3s ease-out',
-          padding: '2rem'
-        }} onClick={() => { setModalLesson(null); setCurrentChapter(null); }}>
-          <div style={{
-            background: 'white',
-            padding: '0',
-            borderRadius: '2rem',
-            width: '95vw',
-            maxWidth: '1400px',
-            height: '90vh',
-            maxHeight: '90vh',
-            position: 'relative',
-            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.3)',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            animation: 'slideInColorChange 0.4s ease-out'
-          }} onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => { setModalLesson(null); setCurrentChapter(null); }} style={{
-              position: 'absolute',
-              top: '2rem',
-              right: '2rem',
-              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50%',
-              width: '3.5rem',
-              height: '3.5rem',
-              cursor: 'pointer',
-              font: 'bold 1.8rem Arial',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'all 200ms ease',
-              zIndex: 10,
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
-            }} onMouseEnter={(e) => e.target.style.transform = 'scale(1.1) rotate(90deg)'} onMouseLeave={(e) => e.target.style.transform = 'scale(1) rotate(0deg)'}>
+        <div className="lesson-modal-overlay" onClick={() => { setModalLesson(null); setCurrentChapter(null); }}>
+          <div className="lesson-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => { setModalLesson(null); setCurrentChapter(null); }} className="lesson-modal-close">
               ✕
             </button>
 
-            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-              <aside style={{
-                minWidth: '240px',
-                background: '#f8fafc',
-                borderRight: '1px solid rgba(148, 163, 184, 0.24)',
-                padding: '2rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-              }}>
+            <div className="lesson-modal-body">
+              <aside className="lesson-modal-sidebar">
                 <div>
                   <p style={{ margin: 0, color: '#6b7280', fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Espace cours</p>
                   <h2 style={{ margin: '0.75rem 0 0 0', fontSize: '1.55rem', color: '#1f2937' }}>Contenu de la leçon</h2>
@@ -491,19 +437,9 @@ function Cours() {
                 </div>
               </aside>
 
-              <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <main className="lesson-modal-main">
                 {activeSection === 'video' ? (
-                  <div style={{
-                    background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%)',
-                    padding: '2.5rem',
-                    borderBottom: '2px solid rgba(37, 99, 235, 0.1)',
-                    textAlign: 'center',
-                    minHeight: '400px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}>
+                  <div className="lesson-modal-video-section">
                     {loadingLesson ? (
                       <div style={{
                         padding: '4rem 3rem',
@@ -528,12 +464,12 @@ function Cours() {
                                 src={toYouTubeEmbed(video.video_url)}
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
-                                style={{ width: '100%', height: '480px', border: 'none' }}
+                                className="lesson-video-iframe"
                               />
                             ) : (
                               <video
                                 controls
-                                style={{ width: '100%', height: '480px', objectFit: 'cover', background: 'black' }}
+                                className="lesson-video-element"
                                 src={getVideoUrl(video.video_url)}
                               />
                             )}
@@ -565,29 +501,12 @@ function Cours() {
                     )}
                   </div>
                 ) : (
-                  <div style={{
-                    overflowY: 'auto',
-                    padding: '3rem',
-                    color: '#111827',
-                    fontSize: '1rem',
-                    lineHeight: '1.9',
-                    flex: 1,
-                    background: 'white'
-                  }} className="lesson-content-scroll">
+                  <div className="lesson-modal-content-section">
                     {modalLesson}
                   </div>
                 )}
 
-                <div style={{
-                  background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%)',
-                  borderTop: '2px solid rgba(37, 99, 235, 0.1)',
-                  padding: '2rem 3rem',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '1.5rem'
-                }}>
+                <div className="lesson-modal-footer">
                   <div style={{ color: '#6b7280', fontSize: '1rem' }}>
                     <strong style={{ color: '#1f2937', fontSize: '1.1rem' }}>Chapitre {currentChapter}</strong> — Testez vos connaissances sur la page Quiz Leçon.
                   </div>
