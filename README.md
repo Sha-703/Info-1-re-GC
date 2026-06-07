@@ -62,5 +62,7 @@ Projet React + Django pour une application éducative de la section première co
 
 - L’API Django est exposée sur `http://localhost:8000/api` en local
 - Le frontend utilise `VITE_API_BASE_URL` pour récupérer les données (par défaut `http://localhost:8000/api`)
+- Pour l’instance déployée, utilisez `VITE_API_BASE_URL=https://info1er-gc-backend-x1o4.onrender.com/api`
+- Le backend déployé est accessible sur `https://info1er-gc-backend-x1o4.onrender.com`
 - Les enseignants peuvent créer des contenus via l’admin Django ou les endpoints API
 
