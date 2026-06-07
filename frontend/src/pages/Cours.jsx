@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api, { API_BASE_URL } from '../services/api';
 
 function Cours() {
   const chapters = [3, 4, 1, 2, 5, 6];
@@ -32,8 +32,7 @@ function Cours() {
     fetchLessonDetail(lessonId);
   };
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-  const apiRootUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+  const apiRootUrl = API_BASE_URL.replace(/\/api\/?$/, '');
 
   const getVideoUrl = (videoUrl) => {
     if (!videoUrl) return '';

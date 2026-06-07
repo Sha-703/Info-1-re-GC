@@ -4,8 +4,10 @@ const defaultApiBase = window.location.hostname === 'localhost' || window.locati
   ? 'http://localhost:8000/api'
   : 'https://info1er-gc-backend-x1o4.onrender.com/api';
 
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || defaultApiBase;
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || defaultApiBase,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
