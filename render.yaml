@@ -6,7 +6,7 @@ services:
     branch: main
     repoPath: backend
     buildCommand: pip install -r requirements.txt
-    startCommand: bash -lc "python manage.py migrate --noinput && python populate_lesson_questions.py && python manage.py collectstatic --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: bash -lc "python manage.py migrate --noinput && python manage.py seed_lessons && python manage.py collectstatic --noinput && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT"
     healthCheckPath: /api/
     envVars:
       - key: DJANGO_SECRET_KEY

@@ -240,6 +240,11 @@ function LessonQuiz() {
           <div className="content-panel" style={{ textAlign: 'center' }}>
             <p>Chargement des leçons...</p>
           </div>
+        ) : lessons.length === 0 ? (
+          <div className="content-panel" style={{ textAlign: 'center' }}>
+            <p>Aucune leçon n'a été trouvée. Le backend ne semble pas encore avoir de données publiées.</p>
+            <p>Veuillez vérifier la population de la base de données et redéployer le backend.</p>
+          </div>
         ) : (
           <div className="list-grid">
             {lessons.map((lesson) => (
