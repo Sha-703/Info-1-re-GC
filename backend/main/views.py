@@ -128,7 +128,7 @@ class LessonViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
     @action(detail=True, methods=['get'])
-    def questions(self, request, pk=None):
+    def questions(self, request, order=None):
         """Get all quiz questions for a lesson"""
         lesson = self.get_object()
         questions = lesson.quiz_questions.all()
