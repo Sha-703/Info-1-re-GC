@@ -8,8 +8,30 @@ function Cours() {
   const [currentChapter, setCurrentChapter] = useState(null);
   const [activeSection, setActiveSection] = useState('content');
   const [lessonDetails, setLessonDetails] = useState({});
+  const [lessonOrderMap, setLessonOrderMap] = useState({});
   const [loadingLesson, setLoadingLesson] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchLessons = async () => {
+      try {
+        const response = await api.get('/lessons/');
+        const map = {};
+        response.data.forEach((lesson) => {
+          if (lesson.order != null) {
+            map[lesson.order] = lesson.id;
+          }
+        });
+        setLessonOrderMap(map);
+      } catch (error) {
+        console.error('Erreur lors du chargement des leçons pour la carte de correspondance :', error);
+      }
+    };
+
+    fetchLessons();
+  }, []);
+
+  const resolveLessonId = (lessonNumber) => lessonOrderMap[lessonNumber] || lessonNumber;
 
   const fetchLessonDetail = async (lessonId) => {
     if (!lessonId || lessonDetails[lessonId]) return;
@@ -25,11 +47,11 @@ function Cours() {
     }
   };
 
-  const openLessonModal = (content, lessonId, number) => {
+  const openLessonModal = (content, lessonNumber, number) => {
     setModalLesson(content);
     setCurrentChapter(number);
     setActiveSection('content');
-    fetchLessonDetail(lessonId);
+    fetchLessonDetail(resolveLessonId(lessonNumber));
   };
 
   const apiRootUrl = API_BASE_URL.replace(/\/api\/?$/, '');
@@ -382,7 +404,7 @@ function Cours() {
                   <button onClick={() => openLessonModal(content.fullContent, number, number)} className="btn btn-view" style={{ background: `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)` }}>
                     👁️ Voir le cours
                   </button>
-                  <button onClick={() => navigate(`/lesson-quiz?lessonId=${number}`)} className="btn btn-quiz" style={{ background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)` }}>
+                  <button onClick={() => navigate(`/lesson-quiz?lessonId=${resolveLessonId(number)}`)} className="btn btn-quiz" style={{ background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)` }}>
                     🎯 Quiz du chapitre
                   </button>
                 </div>

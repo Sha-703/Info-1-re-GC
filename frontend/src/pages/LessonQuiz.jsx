@@ -5,6 +5,7 @@ import '../styles.css';
 
 function LessonQuiz() {
   const [lessons, setLessons] = useState([]);
+  const [lessonOrderMap, setLessonOrderMap] = useState({});
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -18,17 +19,35 @@ function LessonQuiz() {
 
   useEffect(() => {
     fetchLessons();
-    const lessonId = new URLSearchParams(location.search).get('lessonId');
-    if (lessonId) {
-      fetchLessonQuestions(Number(lessonId));
+  }, []);
+
+  useEffect(() => {
+    const lessonId = Number(new URLSearchParams(location.search).get('lessonId'));
+    if (lessonId && lessons.length > 0) {
+      fetchLessonQuestions(resolveLessonId(lessonId));
     }
-  }, [location.search]);
+  }, [location.search, lessons]);
+
+  const resolveLessonId = (lessonId) => {
+    if (!lessonId) return null;
+    if (lessons.some((lesson) => lesson.id === lessonId)) {
+      return lessonId;
+    }
+    return lessonOrderMap[lessonId] || lessonId;
+  };
 
   const fetchLessons = async () => {
     try {
       setLoading(true);
       const response = await api.get('/lessons/');
       setLessons(response.data);
+      const map = {};
+      response.data.forEach((lesson) => {
+        if (lesson.order != null) {
+          map[lesson.order] = lesson.id;
+        }
+      });
+      setLessonOrderMap(map);
     } catch (error) {
       console.error('Erreur lors du chargement des leçons:', error);
     } finally {
@@ -37,11 +56,13 @@ function LessonQuiz() {
   };
 
   const fetchLessonQuestions = async (lessonId) => {
+    const resolvedLessonId = resolveLessonId(lessonId);
+    if (!resolvedLessonId) return;
     try {
       setLoading(true);
-      const response = await api.get(`/lessons/${lessonId}/questions/`);
+      const response = await api.get(`/lessons/${resolvedLessonId}/questions/`);
       setQuestions(response.data);
-      setSelectedLesson(lessonId);
+      setSelectedLesson(resolvedLessonId);
       setCurrentQuestionIndex(0);
       setAnswers({});
       setShowResults(false);
