@@ -6,6 +6,7 @@ import '../styles.css';
 function LessonQuiz() {
   const [lessons, setLessons] = useState([]);
   const [lessonOrderMap, setLessonOrderMap] = useState({});
+  const [selectedLessonOrder, setSelectedLessonOrder] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -22,11 +23,16 @@ function LessonQuiz() {
   }, []);
 
   useEffect(() => {
-    const lessonId = Number(new URLSearchParams(location.search).get('lessonId'));
-    if (lessonId && lessons.length > 0) {
-      fetchLessonQuestions(resolveLessonId(lessonId));
+    const lessonOrder = Number(new URLSearchParams(location.search).get('lessonOrder'));
+    if (lessonOrder && lessons.length > 0) {
+      const resolvedId = lessonOrderMap[lessonOrder];
+      if (resolvedId) {
+        setSelectedLesson(resolvedId);
+      }
+      setSelectedLessonOrder(lessonOrder);
+      fetchLessonQuestions(lessonOrder, resolvedId);
     }
-  }, [location.search, lessons]);
+  }, [location.search, lessons, lessonOrderMap]);
 
   const resolveLessonId = (lessonId) => {
     if (!lessonId) return null;
@@ -62,21 +68,37 @@ function LessonQuiz() {
     }
   };
 
-  const fetchLessonQuestions = async (lessonId) => {
-    const resolvedLessonId = resolveLessonId(lessonId);
-    if (!resolvedLessonId) return;
-    console.log('Fetching lesson questions for resolved id:', resolvedLessonId);
+  const fetchLessonQuestions = async (lessonOrder, existingLessonId = null) => {
+    if (!lessonOrder) return;
+    const resolvedLessonId = existingLessonId || lessonOrderMap[lessonOrder];
+    let finalLessonId = resolvedLessonId;
+
+    setSelectedLessonOrder(lessonOrder);
+    console.log('Fetching lesson questions for lessonOrder:', lessonOrder, 'resolvedLessonId:', resolvedLessonId);
+
     try {
       setLoading(true);
-      const response = await api.get(`/lessons/${resolvedLessonId}/questions/`);
+      const response = await api.get(`/lessons/${lessonOrder}/questions/`);
+
+      if (!finalLessonId) {
+        const lessonResponse = await api.get(`/lessons/${lessonOrder}/`);
+        finalLessonId = lessonResponse.data.id;
+        setSelectedLesson(finalLessonId);
+        setLessons((prev) => {
+          if (prev.some((lesson) => lesson.id === finalLessonId)) return prev;
+          return [...prev, lessonResponse.data];
+        });
+      } else {
+        setSelectedLesson(finalLessonId);
+      }
+
       setQuestions(response.data);
-      setSelectedLesson(resolvedLessonId);
       setCurrentQuestionIndex(0);
       setAnswers({});
       setShowResults(false);
       setResults(null);
     } catch (error) {
-      console.error('Erreur lors du chargement des questions:', error);
+      console.error('Erreur lors du chargement des questions :', error);
     } finally {
       setLoading(false);
     }
@@ -129,7 +151,7 @@ function LessonQuiz() {
   };
 
   const getLesson = () => {
-    return lessons.find(l => l.id === selectedLesson);
+    return lessons.find(l => l.id === selectedLesson) || lessons.find(l => l.order === selectedLessonOrder);
   };
   const LOCAL_SCORE_KEY = 'lessonQuizLocalResults';
 
@@ -251,7 +273,7 @@ function LessonQuiz() {
               <article
                 key={lesson.id}
                 className="card card--clickable"
-                onClick={() => fetchLessonQuestions(lesson.id)}
+                onClick={() => { setSelectedLessonOrder(lesson.order); setSelectedLesson(lesson.id); fetchLessonQuestions(lesson.order, lesson.id); }}
                 style={{ borderTop: `4px solid #7c3aed` }}
               >
                 <div className="card-icon" style={{ background: 'rgba(124, 58, 237, 0.1)', color: '#7c3aed' }}>

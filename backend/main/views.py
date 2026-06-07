@@ -93,6 +93,8 @@ class LessonViewSet(viewsets.ModelViewSet):
     queryset = Lesson.objects.filter(published=True).order_by('order')
     serializer_class = LessonSerializer
     permission_classes = [IsTeacherOrReadOnly]
+    lookup_field = 'order'
+    lookup_value_regex = '[0-9]+'
 
     def get_queryset(self):
         if self.action in ['retrieve', 'questions', 'submit_quiz']:

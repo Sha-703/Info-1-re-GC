@@ -59,17 +59,11 @@ function Cours() {
   };
 
   const openLessonModal = (content, lessonNumber, number) => {
-    const resolved = resolveLessonId(lessonNumber);
-    if (!resolved) {
-      alert('Le service de leçons n’est pas encore prêt ou l’identifiant est introuvable. Réessayez dans un instant.');
-      return;
-    }
-
     setModalLesson(content);
     setCurrentChapter(number);
     setActiveSection('content');
-    console.log('Opening lesson modal', { lessonNumber, resolved });
-    fetchLessonDetail(resolved);
+    console.log('Opening lesson modal', { lessonNumber });
+    fetchLessonDetail(lessonNumber);
   };
 
   const apiRootUrl = API_BASE_URL.replace(/\/api\/?$/, '');
@@ -422,7 +416,7 @@ function Cours() {
                   <button onClick={() => openLessonModal(content.fullContent, number, number)} className="btn btn-view" style={{ background: `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)` }}>
                     👁️ Voir le cours
                   </button>
-                  <button onClick={() => navigate(`/lesson-quiz?lessonId=${resolveLessonId(number)}`)} className="btn btn-quiz" style={{ background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)` }}>
+                  <button onClick={() => navigate(`/lesson-quiz?lessonOrder=${number}`)} className="btn btn-quiz" style={{ background: `linear-gradient(135deg, #22c55e 0%, #16a34a 100%)` }}>
                     🎯 Quiz du chapitre
                   </button>
                 </div>

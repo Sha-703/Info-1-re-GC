@@ -17,9 +17,9 @@ lessons_data = {
     "Mémoire informatique": 6,
 }
 
-# Créer les leçons si elles n'existent pas
+# Créer ou mettre à jour les leçons
 for title, order in lessons_data.items():
-    lesson, created = Lesson.objects.get_or_create(
+    lesson, created = Lesson.objects.update_or_create(
         title=title,
         defaults={
             'content': f'Contenu pour {title}',
@@ -30,7 +30,7 @@ for title, order in lessons_data.items():
     if created:
         print(f"✓ Leçon créée: {title}")
     else:
-        print(f"✓ Leçon existante: {title}")
+        print(f"✓ Leçon mise à jour: {title}")
 
 # Questions pour le Bus (Chapitre 1)
 bus_questions = [
