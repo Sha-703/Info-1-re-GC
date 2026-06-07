@@ -16,6 +16,7 @@ function Cours() {
     try {
       setLoadingLesson(true);
       const response = await api.get(`/lessons/${lessonId}/`);
+      console.log('Lesson details loaded:', { lessonId, videos: response.data?.videos });
       setLessonDetails((prev) => ({ ...prev, [lessonId]: response.data }));
     } catch (error) {
       console.error('Erreur lors du chargement de la leçon :', error);
@@ -44,7 +45,8 @@ function Cours() {
 
   const isYouTube = (url) => {
     if (!url) return false;
-    return /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)/i.test(url);
+    const youtubePatterns = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)/i;
+    return youtubePatterns.test(url);
   };
 
   const toYouTubeEmbed = (url) => {
@@ -53,13 +55,17 @@ function Cours() {
       // Si déjà embed
       if (url.includes('youtube.com/embed/')) return url;
       // youtu.be short link
-      const shortMatch = url.match(/youtu\.be\/(.+)$/);
+      const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
       if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
       // standard watch?v= link
       const vMatch = url.match(/[?&]v=([^&]+)/);
       if (vMatch) return `https://www.youtube.com/embed/${vMatch[1]}`;
+      // youtube.com/v/ format
+      const vMatch2 = url.match(/\/v\/([^?&]+)/);
+      if (vMatch2) return `https://www.youtube.com/embed/${vMatch2[1]}`;
       return url;
     } catch (e) {
+      console.warn('Error converting YouTube URL:', url, e);
       return url;
     }
   };
@@ -456,29 +462,38 @@ function Cours() {
                       </div>
                     ) : lessonDetails[currentChapter] && lessonDetails[currentChapter].videos?.length > 0 ? (
                       <div style={{ display: 'grid', gap: '1.5rem', width: '100%' }}>
-                        {lessonDetails[currentChapter].videos.map((video) => (
-                          <div key={video.id} style={{ borderRadius: '1.25rem', overflow: 'hidden', background: 'white', boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)', maxWidth: '100%' }}>
-                            {isYouTube(video.video_url) ? (
-                              <iframe
-                                title={video.title}
-                                src={toYouTubeEmbed(video.video_url)}
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                className="lesson-video-iframe"
-                              />
-                            ) : (
-                              <video
-                                controls
-                                className="lesson-video-element"
-                                src={getVideoUrl(video.video_url)}
-                              />
-                            )}
+                        {lessonDetails[currentChapter].videos.map((video) => {
+                          console.log('Rendering video:', { id: video.id, title: video.title, url: video.video_url, isYouTube: isYouTube(video.video_url) });
+                          return (
+                            <div key={video.id} style={{ borderRadius: '1.25rem', overflow: 'hidden', background: 'white', boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)', maxWidth: '100%' }}>
+                              {isYouTube(video.video_url) ? (
+                                <iframe
+                                  title={video.title}
+                                  src={toYouTubeEmbed(video.video_url)}
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="lesson-video-iframe"
+                                  onError={() => console.error('YouTube iframe failed to load:', video.video_url)}
+                                />
+                              ) : video.video_url ? (
+                                <video
+                                  controls
+                                  className="lesson-video-element"
+                                  src={getVideoUrl(video.video_url)}
+                                  onError={() => console.error('Video failed to load:', getVideoUrl(video.video_url))}
+                                />
+                              ) : (
+                                <div style={{ padding: '2rem', textAlign: 'center', background: '#fee2e2' }}>
+                                  <p style={{ color: '#991b1b', margin: 0 }}>⚠️ Pas d'URL vidéo fournie</p>
+                                </div>
+                              )}
                             <div style={{ padding: '1.75rem', textAlign: 'left' }}>
                               <h3 style={{ margin: '0 0 0.75rem 0', color: '#1f2937', fontSize: '1.35rem', fontWeight: '700' }}>{video.title}</h3>
                               <p style={{ margin: 0, color: '#6b7280', fontSize: '1rem', lineHeight: '1.6' }}>{video.description || 'Vidéo tutorielle intégrée depuis le backend.'}</p>
                             </div>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <div style={{

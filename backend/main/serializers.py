@@ -105,7 +105,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class LessonDetailSerializer(serializers.ModelSerializer):
-    videos = VideoSerializer(many=True, read_only=True)
+    videos = VideoSerializer(many=True, read_only=True, source='videos')
 
     class Meta:
         model = Lesson
