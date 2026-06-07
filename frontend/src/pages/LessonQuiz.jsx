@@ -33,7 +33,9 @@ function LessonQuiz() {
     if (lessons.some((lesson) => lesson.id === lessonId)) {
       return lessonId;
     }
-    return lessonOrderMap[lessonId] || lessonId;
+    const resolved = lessonOrderMap[lessonId] || lessonId;
+    console.log('Resolved lesson id', { input: lessonId, resolved });
+    return resolved;
   };
 
   const fetchLessons = async () => {
@@ -48,6 +50,7 @@ function LessonQuiz() {
         }
       });
       setLessonOrderMap(map);
+      console.log('Loaded lesson order map:', map);
     } catch (error) {
       console.error('Erreur lors du chargement des leçons:', error);
     } finally {
@@ -58,6 +61,7 @@ function LessonQuiz() {
   const fetchLessonQuestions = async (lessonId) => {
     const resolvedLessonId = resolveLessonId(lessonId);
     if (!resolvedLessonId) return;
+    console.log('Fetching lesson questions for resolved id:', resolvedLessonId);
     try {
       setLoading(true);
       const response = await api.get(`/lessons/${resolvedLessonId}/questions/`);

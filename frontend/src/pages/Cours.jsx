@@ -23,6 +23,7 @@ function Cours() {
           }
         });
         setLessonOrderMap(map);
+        console.log('Loaded lesson order map:', map);
       } catch (error) {
         console.error('Erreur lors du chargement des leçons pour la carte de correspondance :', error);
       }
@@ -51,7 +52,9 @@ function Cours() {
     setModalLesson(content);
     setCurrentChapter(number);
     setActiveSection('content');
-    fetchLessonDetail(resolveLessonId(lessonNumber));
+    const resolved = resolveLessonId(lessonNumber);
+    console.log('Opening lesson modal', { lessonNumber, resolved });
+    fetchLessonDetail(resolved);
   };
 
   const apiRootUrl = API_BASE_URL.replace(/\/api\/?$/, '');
