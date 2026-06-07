@@ -96,10 +96,20 @@ class LessonViewSet(viewsets.ModelViewSet):
     lookup_field = 'order'
     lookup_value_regex = '[0-9]+'
 
+    def ensure_lessons_populated(self):
+        if not Lesson.objects.exists():
+            from .seed_data import populate_lessons_and_questions
+            populate_lessons_and_questions()
+
     def get_queryset(self):
+        self.ensure_lessons_populated()
         if self.action in ['retrieve', 'questions', 'submit_quiz']:
             return Lesson.objects.all().order_by('order')
         return self.queryset
+
+    def list(self, request, *args, **kwargs):
+        self.ensure_lessons_populated()
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == 'retrieve':
